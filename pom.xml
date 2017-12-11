@@ -1,0 +1,168 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.my.project</groupId>
+	<artifactId>hello-cxf</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxws</artifactId>
+			<version>3.1.14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+			<version>3.1.14</version>
+		</dependency>
+		<!-- Jetty is needed if you're using the CXFServlet -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http-jetty</artifactId>
+			<version>3.1.14</version>
+		</dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>4.3.13.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>4.3.13.RELEASE</version>
+        </dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>hello-cxf</finalName>
+
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<outputDirectory>src/main/webapp/WEB-INF/classes</outputDirectory>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		<testOutputDirectory>target/test-classes</testOutputDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
+
+		<plugins>
+			<plugin>
+			    <groupId>org.apache.cxf</groupId>
+			    <artifactId>cxf-codegen-plugin</artifactId>
+			    <version>3.1.14</version>
+			    <executions>
+			        <execution>
+			            <id>generate-sources</id>
+			            <phase>compile</phase>
+			            <configuration>
+			                <sourceRoot>${basedir}/src/test/java</sourceRoot>
+			                <wsdlOptions>
+			                	<!--
+			                    <wsdlOption>
+			                        <wsdl>http://localhost:9000/myService?wsdl</wsdl>
+			                        <extraargs>
+			                        	<extraarg>-client</extraarg>
+			                        	<extraarg>-server</extraarg>
+			                        	<extraarg>-impl</extraarg>
+                    					<extraarg>-verbose</extraarg>
+                    					<extraarg>-p</extraarg>
+                    					<extraarg>com.my.project.fromjava.wsdl2java</extraarg>
+			                        </extraargs>
+			                    </wsdlOption>
+			                    -->
+			                    <!--
+			                    <wsdlOption>
+			                        <wsdl>${basedir}/src/main/resources/META-INF/wsdl/calc.wsdl</wsdl>
+			                        <extraargs>
+			                        	<extraarg>-client</extraarg>
+			                        	<extraarg>-server</extraarg>
+			                        	<extraarg>-impl</extraarg>
+                    					<extraarg>-verbose</extraarg>
+                    					<extraarg>-p</extraarg>
+                    					<extraarg>com.my.project.fromwsdl.wsdl2java</extraarg>
+			                        </extraargs>
+			                    </wsdlOption>
+			                    -->
+			                    <!--
+			                    <wsdlOption>
+			                        <wsdl>http://localhost:8080/hello-cxf/services/calcService?wsdl</wsdl>
+			                        <extraargs>
+			                        	<extraarg>-client</extraarg>
+			                        	<extraarg>-server</extraarg>
+			                        	<extraarg>-impl</extraarg>
+                    					<extraarg>-verbose</extraarg>
+                    					<extraarg>-p</extraarg>
+                    					<extraarg>com.my.project.spring.wsdl2java</extraarg>
+			                        </extraargs>
+			                    </wsdlOption>
+			                    -->
+			                </wsdlOptions>
+			            </configuration>
+			            <goals>
+			                <goal>wsdl2java</goal>
+			            </goals>
+			        </execution>
+			    </executions>
+			</plugin>
+			<plugin>
+				<!-- http://www.eclipse.org/jetty/documentation/current/jetty-maven-plugin.html -->
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.3.6.v20151106</version>
+				<configuration>
+					<webApp>
+						<contextPath>/hello-cxf</contextPath>
+					</webApp>
+					<!-- mvn jetty:run -->
+					<httpConnector>
+						<port>8080</port>
+						<idleTimeout>60000</idleTimeout>
+					</httpConnector>
+					<!-- The pause in seconds between sweeps of the webapp to check for 
+						changes and automatically hot redeploy if any are detected. -->
+					<scanIntervalSeconds>2</scanIntervalSeconds>
+					<reload>manual</reload>
+					<!-- mvn jetty:stop -->
+					<stopKey>exit</stopKey>
+					<stopPort>9090</stopPort>
+					<!-- request log -->
+					<requestLog implementation="org.eclipse.jetty.server.NCSARequestLog">
+						<filename>target/access-yyyy_mm_dd.log</filename>
+						<filenameDateFormat>yyyy-MM-dd</filenameDateFormat>
+						<logDateFormat>yyyy-MM-dd HH:mm:ss</logDateFormat>
+						<logTimeZone>GMT+8:00</logTimeZone>
+						<retainDays>90</retainDays>
+						<append>true</append>
+					</requestLog>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

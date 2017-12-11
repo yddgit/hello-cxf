@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://www.example.org/calc" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="calcService"
+	targetNamespace="http://www.example.org/calc">
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://www.example.org/calc">
+			<!-- 引入外部schema -->
+			<xsd:include schemaLocation="calc.xsd"></xsd:include>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="add">
+		<wsdl:part element="tns:add" name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="addResponse">
+		<wsdl:part element="tns:addResponse" name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="authorizedUser">
+		<wsdl:part element="tns:authorizedUser" name="authorizedUser"/>
+	</wsdl:message>
+	<wsdl:portType name="calcService">
+		<wsdl:operation name="add">
+			<wsdl:input message="tns:add" />
+			<wsdl:output message="tns:addResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="calcServicePort" type="tns:calcService">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="add">
+			<soap:operation soapAction="http://www.example.org/calc/add" />
+			<wsdl:input>
+				<soap:body use="literal" />
+				<soap:header use="literal" part="authorizedUser" message="tns:authorizedUser"></soap:header>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="calcService">
+		<wsdl:port binding="tns:calcServicePort" name="calcServicePort">
+			<soap:address location="http://localhost:9000/calcService" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
